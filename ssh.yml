@@ -1,0 +1,37 @@
+---
+
+- hosts: ssh
+#  become: yes
+  vars:
+    - name: test
+
+  tasks:
+    - name: adduser
+      user: name=hadoop generate_ssh_key=yes
+      become: yes
+    
+    - name: fetch
+      fetch: src=/home/hadoop/.ssh/id_rsa.pub dest=/tmp/  
+      become: yes
+    
+    - name: merge
+      local_action: shell cat /tmp/*/home/hadoop/.ssh/id_rsa.pub  >> /tmp/authorized_keys
+      run_once: true
+#      delegate_to: 192.168.113.84
+
+    - name: copy
+      copy: src=/tmp/authorized_keys dest=/home/hadoop/.ssh/authorized_keys
+      become: yes
+   
+    - name: chmod
+      file: path=/home/hadoop/.ssh/authorized_keys owner=hadoop group=hadoop  mode=0600
+      become: yes
+
+    - name: clear
+      file: path=/tmp/{{ item }} state=absent
+      with_items:
+        - "{{ play_hosts  }}"
+        - authorized_keys
+      delegate_to: localhost
+      run_once: true
+      

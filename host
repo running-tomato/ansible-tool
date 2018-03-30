@@ -1,0 +1,4 @@
+#host组名,默认ssh
+[ssh]
+l-hbase1.dba.dev.cn0
+l-hbase2.dba.dev.cn0
